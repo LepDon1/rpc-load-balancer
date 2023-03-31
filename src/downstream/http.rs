@@ -2,7 +2,7 @@
 use std::sync::Arc;
 use std::net::SocketAddr;
 
-use std::sync::mpsc::Sender;
+use async_channel::Sender;
 use tokio::io::{
     BufReader,
     AsyncRead,
@@ -22,15 +22,19 @@ pub struct Http {}
 #[async_trait]
 impl Service for Http {
     /// starts a TcpListener that handles requests asynchronously
-    async fn start(id: u32, relay_channel: Sender<Message>) -> Result<(), Box<dyn std::error::Error>> {
+    fn start(id: u32, relay_channel: Sender<Message>) -> Result<(), Box<dyn std::error::Error>> {
         // Construct our SocketAddr to listen on...
-        let addr = SocketAddr::from(([127, 0, 0, 1], 5000));
+        let addr = SocketAddr::from(([127, 0, 0, 1], 8999));
         let server = Server::http(addr.to_string()).unwrap();
         
         tokio::spawn( async move {
             for request in server.incoming_requests() {
                 println!("{:?}",&request);
-                handle_request(request, relay_channel.clone());
+                // handle_request(request, relay_channel.clone());
+                let sender = relay_channel.clone();
+                let _ = sender.try_send(Message {
+                    request
+                });
             }
         //     tracing::info!("HTTP listening on {:?}", addr);
         //     loop {
@@ -49,6 +53,7 @@ impl Service for Http {
 
 fn handle_request(req: tiny_http::Request, sender: Sender<Message>) {
     tokio::spawn(async move {
+        println!("{:?}",&req);
         let _ = sender.send(Message {
             // socket_writer: socket_writer.clone(),
             request: req

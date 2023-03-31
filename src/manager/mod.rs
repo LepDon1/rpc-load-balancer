@@ -9,8 +9,8 @@ use http::Request;
 use hyper::Body;
 use nohash_hasher::NoHashHasher;
 use reqwest::Url;
-// use async_channel::{Sender, Receiver, unbounded};
-use std::sync::mpsc::{Sender, Receiver, channel};
+use async_channel::{Sender, Receiver, unbounded};
+// use std::sync::mpsc::{Sender, Receiver, channel};
 use tokio::io::{BufReader, AsyncWriteExt,AsyncBufReadExt};
 use tokio::net::TcpStream;
 
@@ -27,7 +27,7 @@ pub struct Manager {
 
 impl Manager {
     pub async fn start(config: Config) {
-        let (downstream_tx, downstream_rx) = channel();
+        let (downstream_tx, downstream_rx) = unbounded();
         // let (tx, rx) = unbounded();
         // start upstreams
         tracing::info!("Initializing upstreams..");
@@ -51,7 +51,7 @@ impl Manager {
 
     /// starts a single http listener that will relay messages to this component
     async fn start_http_listener(downstream_tx: Sender<Message>) -> Result<(), Box<dyn Error>> {
-        Http::start(0, downstream_tx).await
+        Http::start(0, downstream_tx)
     }
 
     /// should be used to spin up downstream websocket connections in the future
@@ -69,7 +69,7 @@ impl Manager {
     pub async fn start_scheduler(self_: Arc<SafeMutex<Self>>, mut downstream_rx: Receiver<Message>) {
         loop {
             println!("LOOP1");
-            let msg_opt = downstream_rx.recv();
+            let msg_opt = downstream_rx.recv().await;
             tracing::info!("Up: {:?}", &msg_opt);
             match msg_opt {
                 Ok(msg) => {
