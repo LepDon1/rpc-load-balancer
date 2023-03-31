@@ -1,0 +1,22 @@
+[package]
+name = "rpc-proxy"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nohash-hasher = "0.2.0"
+tokio = { version = "1.27.0", features = ["full"] }
+serde = { version = "1.0.159", default-features = false, features = ['derive'] }
+http = "0.2.9"
+tiny_http = "0.12.0"
+reqwest = "0.11.16"
+hyper = "0.14.25"
+async-channel = "1.8.0"
+toml = "0.7.3"
+tracing = "0.1.37"
+tracing-subscriber = "0.3.16"
+async-trait = "0.1.68"
+httpcodec = "0.2.3"
+bytecodec = "0.4.15"
