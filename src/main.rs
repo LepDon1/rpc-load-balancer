@@ -64,10 +64,14 @@ async fn main() {
 
     let scheduler = Scheduler::new(config);
     let scheduler_clone = scheduler.clone();
-    // let http_service = tokio::spawn(async move {
-        services::http::Http::start(scheduler_clone, 8000);
-    // });
+    
+    // start Websocket service 
+    tokio::spawn(async move {
+        services::websocket::Websocket::start(scheduler_clone, 8001);
+    });
 
-    // http_service.await;
+    // start HTTP service
+    services::http::Http::start(scheduler, 8000);
+
     
 }

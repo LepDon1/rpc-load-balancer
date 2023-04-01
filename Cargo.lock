@@ -815,6 +815,7 @@ name = "rpc-proxy"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "futures-util",
  "http",
  "nohash-hasher",
  "reqwest",
@@ -823,6 +824,7 @@ dependencies = [
  "simple-websockets",
  "tiny_http",
  "tokio",
+ "tokio-tungstenite",
  "toml",
  "tracing",
  "tracing-subscriber",
