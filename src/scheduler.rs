@@ -9,15 +9,18 @@ use crate::types::SafeMutex;
 
 pub type NoHasher = BuildHasherDefault<NoHashHasher<u32>>;
 
+
 pub enum ServiceType {
     HTTP,
     Websocket
 }
 
+#[derive(Clone)]
 pub struct Scheduler {
     http: HashMap<u32, UpstreamConfig, NoHasher>,
     websockets: HashMap<u32, UpstreamConfig, NoHasher>,
-    tracker: u32,
+    http_tracker: u32,
+    ws_tracker: u32
 }
 
 impl Scheduler {
@@ -28,7 +31,8 @@ impl Scheduler {
             Self {
                 http,
                 websockets,
-                tracker: 0
+                http_tracker: 0,
+                ws_tracker: 0
             }
         ))
     }
@@ -42,18 +46,24 @@ impl Scheduler {
     }
 
 
-    pub fn schedule(&mut self, service_type: ServiceType) -> (u32, UpstreamConfig) {
-        let map = match service_type {
-            ServiceType::HTTP => self.http.clone(),
-            ServiceType::Websocket => self.websockets.clone()
-        };
-
-        let count = map.keys().count() as u32;
-        self.tracker += 1;
-        if self.tracker > count - 1 {
-            self.tracker = 0;
+    pub fn schedule_http(&mut self) -> (u32, UpstreamConfig) {
+        let count = self.http.keys().count() as u32;
+        self.http_tracker += 1;
+        if self.http_tracker > count - 1 {
+            self.http_tracker = 0;
         }
 
-        (self.tracker, map.get(&self.tracker).unwrap().clone())
+        (self.http_tracker, self.http.get(&self.http_tracker).unwrap().clone())
     }
+
+    pub fn schedule_ws(&mut self) -> (u32, UpstreamConfig) {
+        let count = self.websockets.keys().count() as u32;
+        self.ws_tracker += 1;
+        if self.ws_tracker > count - 1 {
+            self.ws_tracker = 0;
+        }
+
+        (self.ws_tracker, self.websockets.get(&self.ws_tracker).unwrap().clone())
+    }
+
 }

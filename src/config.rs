@@ -10,6 +10,6 @@ pub struct Config {
 #[derive(Debug, Deserialize, Clone)]
 pub struct UpstreamConfig {
     pub rpc_url: String,
-    pub requests_per_min_limit: u32
+    pub requests_per_min_limit: u32,
 }
 

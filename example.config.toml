@@ -1,6 +1,9 @@
 
 
-[[upstreams]]
-rpc_url = ""
-requests_per_min_limit = 150
-# /v2/A4l4SIsXQC4stqAzE2O5MrTEFiYm9rXA
+[[http]]
+rpc_url = "https://api.devnet.solana.com"
+requests_per_min_limit = 10
+
+[[websockets]]
+rpc_url = "ws://api.devnet.solana.com"
+requests_per_min_limit = 10

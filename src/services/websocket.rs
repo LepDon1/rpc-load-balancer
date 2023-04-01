@@ -120,7 +120,7 @@ impl Service for Websocket {
 impl Websocket {
     fn connect(self_: Arc<SafeMutex<Self>>, client_id: u64, responder: Responder, scheduler: Arc<SafeMutex<Scheduler>>) {
         // schedule websocket
-        let (_rpc_id, upstream_rpc) = scheduler.safe_lock(|s| s.schedule(ServiceType::Websocket));
+        let (_rpc_id, upstream_rpc) = scheduler.safe_lock(|s| s.schedule_ws());
         let (tx, rx) = channel(100);
         // set up websocket with rpc
         let channel = Arc::new(SafeMutex::new(
