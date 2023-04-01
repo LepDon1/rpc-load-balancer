@@ -3,7 +3,8 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
-    pub upstreams: Vec<UpstreamConfig>
+    pub http: Vec<UpstreamConfig>,
+    pub websockets: Vec<UpstreamConfig>
 }
 
 #[derive(Debug, Deserialize, Clone)]

@@ -11,11 +11,13 @@
 //! 
 
 
-mod downstream;
-mod manager;
+mod services;
+// mod manager;
+mod scheduler;
 mod config;
 mod args;
 mod types;
+use std::sync::Arc;
 
 use tokio;
 use toml;
@@ -24,7 +26,10 @@ use tracing_subscriber::FmtSubscriber;
 
 use config::Config;
 use args::Args;
-use manager::Manager;
+use types::SafeMutex;
+use services::Service;
+use scheduler::Scheduler;
+// use manager::Manager;
 
 
 fn process_cli_args<'a>() -> Config {
@@ -43,19 +48,26 @@ fn process_cli_args<'a>() -> Config {
 #[tokio::main]
 async fn main() {
     // a builder for `FmtSubscriber`.
-    let subscriber = FmtSubscriber::builder()
-        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
-        // will be written to stdout.
-        .with_max_level(Level::INFO)
-        // completes the builder.
-        .finish();
+    // let subscriber = FmtSubscriber::builder()
+    //     // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
+    //     // will be written to stdout.
+    //     .with_max_level(Level::INFO)
+    //     // completes the builder.
+    //     .finish();
+    tracing_subscriber::fmt::init();
 
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting default subscriber failed");
+    // tracing::subscriber::set_global_default(subscriber)
+        // .expect("setting default subscriber failed");
 
     let config = process_cli_args();
     tracing::info!("Config: {:?}", &config);
 
-    Manager::start(config).await;
+    let scheduler = Scheduler::new(config);
+    let scheduler_clone = scheduler.clone();
+    // let http_service = tokio::spawn(async move {
+        services::http::Http::start(scheduler_clone, 8000);
+    // });
 
+    // http_service.await;
+    
 }

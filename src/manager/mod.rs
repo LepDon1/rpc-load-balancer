@@ -103,7 +103,7 @@ impl Manager {
             // let mut rpc_body = rpc_request.body_mut();
             // let body = reqwest::Body::from(body);
             // rpc_body = &mut Some(body);
-            println!("BODY: {:?}", &body);
+            tracing::debug!("BODY: {:?}", &body);
             let rpc_request = reqwest::Client::new().post(url).body(body);
             tracing::info!("Sending to RPC {:?}", rpc_request);
             let res = rpc_request.send().await;
@@ -111,8 +111,6 @@ impl Manager {
                 Ok(data) => {
                     match data.text().await {
                         Ok(text) => {
-                            println!("TEXT: {:?}", &text);
-                            println!("REQ: {:?}", &msg.request);
                             msg.request.remote_addr();
                             if let Err(e) = msg.request.respond(tiny_http::Response::from_string(text)) {
                                 tracing::error!("Failed to respond to client: {:?}", e)

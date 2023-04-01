@@ -4,12 +4,6 @@ use serde::Serialize;
 use tokio::{io::BufReader, net::tcp::OwnedWriteHalf};
 use tiny_http::Request;
 
-#[derive(Debug)]
-pub struct Message {
-    // pub socket_writer: Arc<SafeMutex<OwnedWriteHalf>>,
-    pub request: Request
-}
-
 pub struct SafeMutex<T: ?Sized>(Mutex<T>);
 
 impl<T> SafeMutex<T> {
